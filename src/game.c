@@ -1,12 +1,16 @@
 #include <raylib.h>
 
+#include "global.h"
 #include "player.h"
 #include "bullet.h"
+#include "enemy.h"
 
 #define DEFAULT_PLAYER_STEP 2.0f
 #define RUNNING_PLAYER_STEP 10.0f
 
-#define HOLDING_FIRERATE 0.25f // How many shots per seconds when holding 'fire'
+#define HOLDING_FIRERATE 0.25f // How many seconds per shot when holding 'fire'
+
+#define ENEMY_SPAWN_RATE 2.0f // How many seconds per enemy will spawn
 
 int main(int argc, char **argv)
 {
@@ -15,8 +19,10 @@ int main(int argc, char **argv)
     bool isHoldingShoot = false;
     double lastShotTime = -1;
 
-    const int screenWidth = 800;
-    const int screenHeight = 1000;
+    double lastEnemySpawn = 3;
+
+    const int screenWidth = SCREEN_WIDTH;
+    const int screenHeight = SCREEN_HEIGHT;
 
     InitWindow(screenWidth, screenHeight, "Space Invaders!");
     SetTargetFPS(60);
@@ -24,6 +30,7 @@ int main(int argc, char **argv)
     { // Initialization
         InitializePlayer();
         InitializeBulletSystem();
+        InitializeEnemySystem();
 
         SetPlayerStartingPosition((Vector2){ (float)screenWidth/2, (float)screenHeight/2 });
     }
@@ -55,6 +62,13 @@ int main(int argc, char **argv)
 
             BulletsPositionTick();
             DestroyOffscreenBullets(0);
+
+            if (GetTime() - lastEnemySpawn > ENEMY_SPAWN_RATE) {
+                SpawnEnemy();
+                lastEnemySpawn = GetTime();
+            }
+
+            EnemiesPositionTick();
         }
 
         { // Game Render
@@ -63,6 +77,7 @@ int main(int argc, char **argv)
             if (IsKeyDown(KEY_SPACE)) DrawText("Shoot!", 10, 10, 20, RAYWHITE);
             DrawPlayer();
             DrawBullets();
+            DrawEnemies();
             EndDrawing();
         }
     }
