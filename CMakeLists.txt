@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.15) # required by raylib
 
-project(raylib_game)
+project(space_invaders)
 
 find_package(raylib 4.5 REQUIRED)
 
