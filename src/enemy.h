@@ -19,7 +19,7 @@ extern Enemy *EnemyList;
 
 void InitializeEnemySystem();
 Enemy *SpawnEnemy();
-void EnemiesPositionTick();
+void EnemiesPositionTick(Vector2 playerPosition);
 void DrawEnemies();
 
 

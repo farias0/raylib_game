@@ -4,6 +4,7 @@
 
 #include <raylib.h>
 
+extern Vector2 playerPosition;
 extern Rectangle playerHitbox;
 
 void InitializePlayer();

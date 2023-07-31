@@ -14,12 +14,14 @@
 
 int main(int argc, char **argv)
 {
+    bool isPaused = false;
+
     float playerMovementStep = DEFAULT_PLAYER_STEP;
     
     bool isHoldingShoot = false;
     double lastShotTime = -1;
 
-    double lastEnemySpawn = 3;
+    double lastEnemySpawn = 0;
 
     const int screenWidth = SCREEN_WIDTH;
     const int screenHeight = SCREEN_HEIGHT;
@@ -38,6 +40,14 @@ int main(int argc, char **argv)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         { // Game Update
+            if (isPaused) {
+                if (IsKeyPressed(KEY_ENTER)) isPaused = false;
+                else goto render;
+            }
+            else if (IsKeyPressed(KEY_ENTER)) {
+                isPaused = true;
+            }
+
             Vector2 playerDelta = { 0.0f, 0.0f };
 
             if (IsKeyDown(KEY_LEFT_SHIFT)) playerMovementStep = RUNNING_PLAYER_STEP;
@@ -68,16 +78,18 @@ int main(int argc, char **argv)
                 lastEnemySpawn = GetTime();
             }
 
-            EnemiesPositionTick();
+            EnemiesPositionTick(playerPosition);
         }
 
+render:
         { // Game Render
             BeginDrawing();
             ClearBackground(BLACK);
-            if (IsKeyDown(KEY_SPACE)) DrawText("Shoot!", 10, 10, 20, RAYWHITE);
             DrawPlayer();
             DrawBullets();
             DrawEnemies();
+            if (isPaused) DrawText("PAUSE", screenWidth/2, screenHeight/2, 30, RAYWHITE);
+            if (IsKeyDown(KEY_SPACE)) DrawText("Shoot!", 10, 10, 20, RAYWHITE);
             EndDrawing();
         }
     }

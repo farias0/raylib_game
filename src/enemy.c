@@ -1,6 +1,11 @@
 #include <raylib.h>
+#include <raymath.h>
+#include <math.h>
+
 #include "enemy.h"
 #include "global.h"
+
+#define ENEMY_SPEED 2.0f
 
 static Texture2D sprite;
 
@@ -35,11 +40,13 @@ Enemy *SpawnEnemy() {
     return enemy;
 }
 
-void EnemiesPositionTick() {
+void EnemiesPositionTick(Vector2 playerPosition) {
     Enemy* current = EnemyList;
     
     while (current) {
-        current->position.y += -2.0f;
+        float theta = Vector2LineAngle(current->position, playerPosition);
+        current->position.x += cos(theta);
+        current->position.y += sin(theta);
         syncHitboxWithPosition(current);
 
         current = current->next;
