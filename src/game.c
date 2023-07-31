@@ -2,12 +2,12 @@
 
 #include "player.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
     const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenHeight = 1000;
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - keyboard input");
+    InitWindow(screenWidth, screenHeight, "Space Invaders!");
     SetTargetFPS(60);
 
     { // Initialization
@@ -30,7 +30,7 @@ int main(void)
         { // Game Render
             BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawText("move the ball with arrow keys", 10, 10, 20, DARKGRAY);
+            // DrawText("move the ball with arrow keys", 10, 10, 20, DARKGRAY);
             DrawPlayer();
             EndDrawing();
         }
