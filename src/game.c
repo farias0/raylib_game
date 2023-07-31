@@ -1,6 +1,6 @@
 #include "raylib.h"
 
-#include "src/player.h"
+#include "player.h"
 
 int main(void)
 {
