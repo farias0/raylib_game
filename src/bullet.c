@@ -3,7 +3,7 @@
 
 static Texture2D sprite;
 
-Bullet *BulletList = '\0';
+Bullet *BulletList;
 
 static void syncHitboxWithPosition(Bullet *bullet) {
     bullet->hitbox.x = bullet->position.x;
@@ -21,14 +21,12 @@ Bullet *CreateBullet(Vector2 pos) {
     bullet->hitbox.width = BULLET_WIDTH;
     bullet->hitbox.height = BULLET_WIDTH;
     syncHitboxWithPosition(bullet);
-    bullet->previous = '\0';
-    bullet->next = '\0';
 
-    if (BulletList == '\0') {
+    if (!BulletList) {
         BulletList = bullet;
     } else {
         Bullet *lastBullet = BulletList;
-        while (lastBullet->next != '\0') lastBullet = lastBullet->next;
+        while (lastBullet->next) lastBullet = lastBullet->next;
         bullet->previous = lastBullet;
         lastBullet->next = bullet;
     }
@@ -39,7 +37,7 @@ Bullet *CreateBullet(Vector2 pos) {
 void UpdateBulletsPositionDelta(Vector2 delta) {
     Bullet* current = BulletList;
     
-    while (current != '\0') {
+    while (current) {
         current->position.x += delta.x;
         current->position.y += delta.y;
         syncHitboxWithPosition(current);
@@ -51,10 +49,10 @@ void UpdateBulletsPositionDelta(Vector2 delta) {
 void DestroyOffscreenBullets(int minY) {
     Bullet* current = BulletList;
 
-    while (current != '\0') {
+    while (current) {
         if (current->hitbox.y < minY) {
-            if (current->previous != '\0') current->previous->next = current->next;
-            if (current->next != '\0') current->next->previous = current->previous;
+            if (current->previous) current->previous->next = current->next;
+            if (current->next) current->next->previous = current->previous;
             
             if (BulletList == current) BulletList = current->next;
 
@@ -70,7 +68,7 @@ void DestroyOffscreenBullets(int minY) {
 void DrawBullets() {
     Bullet* current = BulletList;
 
-    while (current != '\0') {
+    while (current) {
         DrawTextureEx(sprite, current->position, 0, BULLET_SPRITE_SCALE, WHITE);
         current = current->next; 
     }
