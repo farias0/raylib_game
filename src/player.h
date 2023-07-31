@@ -4,6 +4,7 @@
 
 #include "raylib.h"
 
+void InitializePlayer();
 void SetPlayerStartingPosition(Vector2 pos);
 void UpdatePlayerPositionDelta(Vector2 pos);
 void DrawPlayer();

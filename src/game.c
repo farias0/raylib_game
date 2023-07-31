@@ -11,6 +11,8 @@ int main(void)
     SetTargetFPS(60);
 
     { // Initialization
+        InitializePlayer();
+
         SetPlayerStartingPosition((Vector2){ (float)screenWidth/2, (float)screenHeight/2 });
     }
 

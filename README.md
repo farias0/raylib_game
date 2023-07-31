@@ -1,4 +1,4 @@
-## Dependencies:
+## Dependencies
 
 ### Raylib
 
@@ -19,3 +19,9 @@ sudo make install
 
 
 I still haven't managed to properly set up the project on Windows. I wish I had it set up as a OS shared library like in Linux, but I'll probably need to have it inside the project structure. Meanwhile I can keep using WSL.
+
+## Assets
+
+### Space Eaters! Asset Pack
+
+[itch.io](https://cluly.itch.io/space-eaters/download/eyJleHBpcmVzIjoxNjkwNzcwNDU1LCJpZCI6NTIyMDM1fQ%3d%3d%2eUSTlqOsYFu9kOJUnZIM2oTVyXwg%3d)
