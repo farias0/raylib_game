@@ -1,5 +1,9 @@
 # Space Invaders Clone
 
+## Observations
+
+* The game should be ran from the `build` directory. Currently, all paths are relative to it (technically, from a directory one level above the project base dir). We should look into using absolute paths, while keeping in mind that OS-agnostic paths might be a problem.
+
 ## Dependencies
 
 ### Raylib
