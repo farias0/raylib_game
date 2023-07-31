@@ -1,9 +1,12 @@
 #include "raylib.h"
 
 #include "player.h"
+#include "bullet.h"
 
 #define DEFAULT_PLAYER_STEP 2.0f
 #define RUNNING_PLAYER_STEP 10.0f
+
+#define BULLET_STEP -6.0f
 
 int main(int argc, char **argv)
 {
@@ -17,9 +20,16 @@ int main(int argc, char **argv)
 
     { // Initialization
         InitializePlayer();
+        InitializeBulletSystem();
 
         SetPlayerStartingPosition((Vector2){ (float)screenWidth/2, (float)screenHeight/2 });
     }
+
+
+    // TODO remove it
+    Bullet bullet;
+    SetBulletStartingPosition(&bullet, (Vector2){ (float)screenWidth/3, (float)screenHeight/3 });
+
 
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
@@ -39,13 +49,17 @@ int main(int argc, char **argv)
                 playerDelta.y += playerMovementStep;
 
             UpdatePlayerPositionDelta(playerDelta);
+
+            if (IsKeyDown(KEY_SPACE)) bullet.position.y = (float)screenWidth/3;
+            UpdateBulletPositionDelta(&bullet, (Vector2){ 0.0f, BULLET_STEP });
         }
 
         { // Game Render
             BeginDrawing();
-            ClearBackground(RAYWHITE);
+            ClearBackground(BLACK);
             // DrawText("move the ball with arrow keys", 10, 10, 20, DARKGRAY);
             DrawPlayer();
+            DrawBullet(&bullet);
             EndDrawing();
         }
     }

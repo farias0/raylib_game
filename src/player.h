@@ -8,7 +8,7 @@ extern Rectangle playerHitbox;
 
 void InitializePlayer();
 void SetPlayerStartingPosition(Vector2 pos);
-void UpdatePlayerPositionDelta(Vector2 pos);
+void UpdatePlayerPositionDelta(Vector2 delta);
 void DrawPlayer();
 
 
