@@ -9,7 +9,7 @@ find_package(raylib 4.5 REQUIRED)
 
 set(CMAKE_C_STANDARD 11) # required by raylib
 
-add_executable(${PROJECT_NAME} main.c)
+add_executable(${PROJECT_NAME} main.c src/player.c)
 
 set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
