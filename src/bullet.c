@@ -1,6 +1,8 @@
 #include <raylib.h>
 #include "bullet.h"
 
+#define BULLET_STEP -6.0f
+
 static Texture2D sprite;
 
 Bullet *BulletList;
@@ -34,12 +36,11 @@ Bullet *CreateBullet(Vector2 pos) {
     return bullet;
 }
 
-void UpdateBulletsPositionDelta(Vector2 delta) {
+void BulletsPositionTick() {
     Bullet* current = BulletList;
     
     while (current) {
-        current->position.x += delta.x;
-        current->position.y += delta.y;
+        current->position.y += BULLET_STEP;
         syncHitboxWithPosition(current);
 
         current = current->next;

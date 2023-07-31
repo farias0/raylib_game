@@ -6,7 +6,6 @@
 #define DEFAULT_PLAYER_STEP 2.0f
 #define RUNNING_PLAYER_STEP 10.0f
 
-#define BULLET_STEP -6.0f
 #define HOLDING_FIRERATE 0.25f // How many shots per seconds when holding 'fire'
 
 int main(int argc, char **argv)
@@ -54,7 +53,7 @@ int main(int argc, char **argv)
                 isHoldingShoot = true;
             } else if (IsKeyUp(KEY_SPACE)) isHoldingShoot = false;
 
-            UpdateBulletsPositionDelta((Vector2){ 0.0f, BULLET_STEP });
+            BulletsPositionTick();
             DestroyOffscreenBullets(0);
         }
 
