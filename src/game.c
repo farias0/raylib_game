@@ -1,4 +1,4 @@
-#include "raylib.h"
+#include <raylib.h>
 
 #include "player.h"
 #include "bullet.h"
@@ -52,9 +52,8 @@ int main(int argc, char **argv)
                 CreateBullet((Vector2){ playerHitbox.x + (playerHitbox.width - BULLET_WIDTH) / 2, playerHitbox.y });
                 lastShotTime = GetTime();
                 isHoldingShoot = true;
-            } else if (IsKeyUp(KEY_SPACE)) {
-                isHoldingShoot = false;
-            };
+            } else if (IsKeyUp(KEY_SPACE)) isHoldingShoot = false;
+
             UpdateBulletsPositionDelta((Vector2){ 0.0f, BULLET_STEP });
             DestroyOffscreenBullets(0);
         }

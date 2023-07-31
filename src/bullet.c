@@ -1,18 +1,14 @@
-#include "raylib.h"
-
+#include <raylib.h>
 #include "bullet.h"
-
 
 static Texture2D sprite;
 
 Bullet *BulletList = '\0';
 
-
 static void syncHitboxWithPosition(Bullet *bullet) {
     bullet->hitbox.x = bullet->position.x;
     bullet->hitbox.y = bullet->position.y;
 }
-
 
 void InitializeBulletSystem() {
     sprite = LoadTexture("../assets/shoot_a.png");

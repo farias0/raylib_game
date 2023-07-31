@@ -2,7 +2,7 @@
 #define _BULLET_H_INCLUDED_
 
 
-#include "raylib.h"
+#include <raylib.h>
 
 #define BULLET_SPRITE_SCALE 3
 #define BULLET_WIDTH (float)(BULLET_SPRITE_SCALE * 8) // sprite is 8x8 pixels
