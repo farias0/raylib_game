@@ -15,6 +15,7 @@
 int main(int argc, char **argv)
 {
     bool isPaused = false;
+    bool isPlayerDead = false;
 
     float playerMovementStep = DEFAULT_PLAYER_STEP;
     
@@ -26,6 +27,8 @@ int main(int argc, char **argv)
     const int screenWidth = SCREEN_WIDTH;
     const int screenHeight = SCREEN_HEIGHT;
 
+    const Vector2 playerStartingPosition = (Vector2){ (float)screenWidth/2, (float)screenHeight/2 };
+
     InitWindow(screenWidth, screenHeight, "Space Invaders!");
     SetTargetFPS(60);
 
@@ -34,14 +37,17 @@ int main(int argc, char **argv)
         InitializeBulletSystem();
         InitializeEnemySystem();
 
-        SetPlayerStartingPosition((Vector2){ (float)screenWidth/2, (float)screenHeight/2 });
+        SetPlayerStartingPosition(playerStartingPosition);
     }
 
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         { // Game Update
             if (isPaused) {
-                if (IsKeyPressed(KEY_ENTER)) isPaused = false;
+                if (IsKeyPressed(KEY_ENTER)) {
+                    isPaused = false;
+                    isPlayerDead = false;
+                }
                 else goto render;
             }
             else if (IsKeyPressed(KEY_ENTER)) {
@@ -79,6 +85,17 @@ int main(int argc, char **argv)
             }
 
             EnemiesPositionTick(playerPosition);
+
+            for (Enemy *enemy = EnemyList; enemy; enemy = enemy->next) {
+                if (CheckCollisionRecs(playerHitbox, enemy->hitbox)) {
+                    isPlayerDead = true;
+                    isPaused = true;
+                    SetPlayerStartingPosition(playerStartingPosition);
+                    DestroyAllBullets();
+                    DestroyAllEnemies();
+                    break;
+                }
+            }    
         }
 
 render:
@@ -88,7 +105,8 @@ render:
             DrawPlayer();
             DrawBullets();
             DrawEnemies();
-            if (isPaused) DrawText("PAUSE", screenWidth/2, screenHeight/2, 30, RAYWHITE);
+            if (isPaused && !isPlayerDead) DrawText("PAUSE", screenWidth/2, screenHeight/2, 30, RAYWHITE);
+            if (isPlayerDead) DrawText("YOU DIED", screenWidth/2, screenHeight/2, 60, RAYWHITE);
             if (IsKeyDown(KEY_SPACE)) DrawText("Shoot!", 10, 10, 20, RAYWHITE);
             EndDrawing();
         }

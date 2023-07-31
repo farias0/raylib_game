@@ -21,6 +21,7 @@ void InitializeBulletSystem();
 Bullet *CreateBullet(Vector2 pos);
 void BulletsPositionTick();
 void DestroyOffscreenBullets(int minY);
+void DestroyAllBullets();
 void DrawBullets();
 
 

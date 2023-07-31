@@ -48,7 +48,7 @@ void BulletsPositionTick() {
 }
 
 void DestroyOffscreenBullets(int minY) {
-    Bullet* current = BulletList;
+    Bullet *current = BulletList;
 
     while (current) {
         if (current->hitbox.y < minY) {
@@ -66,8 +66,20 @@ void DestroyOffscreenBullets(int minY) {
     }
 }
 
+void DestroyAllBullets() {
+    Bullet *current = BulletList;
+
+    while (current) {
+        Bullet *next = current->next;
+        MemFree(current);
+        current = next;
+    }
+
+    BulletList = 0;
+}
+
 void DrawBullets() {
-    Bullet* current = BulletList;
+    Bullet *current = BulletList;
 
     while (current) {
         DrawTextureEx(sprite, current->position, 0, BULLET_SPRITE_SCALE, WHITE);

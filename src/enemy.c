@@ -41,7 +41,7 @@ Enemy *SpawnEnemy() {
 }
 
 void EnemiesPositionTick(Vector2 playerPosition) {
-    Enemy* current = EnemyList;
+    Enemy *current = EnemyList;
     
     while (current) {
         float theta = Vector2LineAngle(current->position, playerPosition);
@@ -53,8 +53,20 @@ void EnemiesPositionTick(Vector2 playerPosition) {
     }
 }
 
+void DestroyAllEnemies() {
+    Enemy *current = EnemyList;
+
+    while (current) {
+        Enemy *next = current->next;
+        MemFree(current);
+        current = next;
+    }
+
+    EnemyList = 0;
+}
+
 void DrawEnemies() {
-    Enemy* current = EnemyList;
+    Enemy *current = EnemyList;
 
     while (current) {
         DrawTextureEx(sprite, current->position, 0, ENEMY_SPRITE_SCALE, WHITE);
