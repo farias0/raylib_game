@@ -23,8 +23,9 @@ sudo make install
 
 **PROTIP**: To uninstall a lib installed with `make install` that doesn't contain a `make uninstall` rule (like raylib), create and install a .deb of it using `checkinstall`, and then uninstall it. ([StackOverflow](https://stackoverflow.com/questions/1439950/whats-the-opposite-of-make-install-i-e-how-do-you-uninstall-a-library-in-li))
 
+I still haven't managed to properly set up the project on Windows. Meanwhile the game can be compiled and ran through WSL2 with no issues.
 
-I still haven't managed to properly set up the project on Windows. Ideally it would use raylib as a shared library to keep consistency with Linux, but it seems it will have to be added to the project structure. Meanwhile the game can be compiled and ran through WSL2 with no issues.
+Eventually I'll have to figure out how to compile raylib alongside the game, so it can be developed natively on Windows, and the game distribution won't have raylib as a dependency.
 
 ## Assets
 
