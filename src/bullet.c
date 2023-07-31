@@ -3,11 +3,9 @@
 #include "bullet.h"
 
 
-#define BULLET_SPRITE_SCALE 3
-#define BULLET_WIDTH (float)(BULLET_SPRITE_SCALE * 8) // sprite is 8x8 pixels
-
-
 static Texture2D sprite;
+
+Bullet *BulletList = '\0';
 
 
 static void syncHitboxWithPosition(Bullet *bullet) {
@@ -20,19 +18,64 @@ void InitializeBulletSystem() {
     sprite = LoadTexture("../assets/shoot_a.png");
 }
 
-void SetBulletStartingPosition(Bullet *bullet, Vector2 pos) {
+Bullet *CreateBullet(Vector2 pos) {
+    Bullet *bullet = MemAlloc(sizeof(Bullet));
+    
     bullet->position = pos;
     bullet->hitbox.width = BULLET_WIDTH;
     bullet->hitbox.height = BULLET_WIDTH;
     syncHitboxWithPosition(bullet);
+    bullet->previous = '\0';
+    bullet->next = '\0';
+
+    if (BulletList == '\0') {
+        BulletList = bullet;
+    } else {
+        Bullet *lastBullet = BulletList;
+        while (lastBullet->next != '\0') lastBullet = lastBullet->next;
+        bullet->previous = lastBullet;
+        lastBullet->next = bullet;
+    }
+
+    return bullet;
 }
 
-void UpdateBulletPositionDelta(Bullet *bullet, Vector2 delta) {
-    bullet->position.x += delta.x;
-    bullet->position.y += delta.y;
-    syncHitboxWithPosition(bullet);
+void UpdateBulletsPositionDelta(Vector2 delta) {
+    Bullet* current = BulletList;
+    
+    while (current != '\0') {
+        current->position.x += delta.x;
+        current->position.y += delta.y;
+        syncHitboxWithPosition(current);
+
+        current = current->next;
+    }
 }
 
-void DrawBullet(Bullet *bullet) {
-    DrawTextureEx(sprite, bullet->position, 0, BULLET_SPRITE_SCALE, WHITE);
+void DestroyOffscreenBullets(int minY) {
+    Bullet* current = BulletList;
+
+    while (current != '\0') {
+        if (current->hitbox.y < minY) {
+            if (current->previous != '\0') current->previous->next = current->next;
+            if (current->next != '\0') current->next->previous = current->previous;
+            
+            if (BulletList == current) BulletList = current->next;
+
+            Bullet *next = current->next;
+            MemFree(current);
+            current = next;
+        } else {
+            current = current->next;
+        }
+    }
+}
+
+void DrawBullets() {
+    Bullet* current = BulletList;
+
+    while (current != '\0') {
+        DrawTextureEx(sprite, current->position, 0, BULLET_SPRITE_SCALE, WHITE);
+        current = current->next; 
+    }
 }

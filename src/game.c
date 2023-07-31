@@ -7,10 +7,14 @@
 #define RUNNING_PLAYER_STEP 10.0f
 
 #define BULLET_STEP -6.0f
+#define HOLDING_FIRERATE 0.25f // How many shots per seconds when holding 'fire'
 
 int main(int argc, char **argv)
 {
     float playerMovementStep = DEFAULT_PLAYER_STEP;
+    
+    bool isHoldingShoot = false;
+    double lastShotTime = -1;
 
     const int screenWidth = 800;
     const int screenHeight = 1000;
@@ -25,19 +29,13 @@ int main(int argc, char **argv)
         SetPlayerStartingPosition((Vector2){ (float)screenWidth/2, (float)screenHeight/2 });
     }
 
-
-    // TODO remove it
-    Bullet bullet;
-    SetBulletStartingPosition(&bullet, (Vector2){ (float)screenWidth/3, (float)screenHeight/3 });
-
-
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         { // Game Update
             Vector2 playerDelta = { 0.0f, 0.0f };
 
             if (IsKeyDown(KEY_LEFT_SHIFT)) playerMovementStep = RUNNING_PLAYER_STEP;
-            if (IsKeyReleased(KEY_LEFT_SHIFT)) playerMovementStep = DEFAULT_PLAYER_STEP;
+            else playerMovementStep = DEFAULT_PLAYER_STEP;
 
             if (IsKeyDown(KEY_RIGHT) && (playerHitbox.x + playerHitbox.width) < screenWidth)
                 playerDelta.x += playerMovementStep;
@@ -50,16 +48,23 @@ int main(int argc, char **argv)
 
             UpdatePlayerPositionDelta(playerDelta);
 
-            if (IsKeyDown(KEY_SPACE)) bullet.position.y = (float)screenWidth/3;
-            UpdateBulletPositionDelta(&bullet, (Vector2){ 0.0f, BULLET_STEP });
+            if (IsKeyDown(KEY_SPACE) && (!isHoldingShoot || GetTime() - lastShotTime > HOLDING_FIRERATE)) {
+                CreateBullet((Vector2){ playerHitbox.x + (playerHitbox.width - BULLET_WIDTH) / 2, playerHitbox.y });
+                lastShotTime = GetTime();
+                isHoldingShoot = true;
+            } else if (IsKeyUp(KEY_SPACE)) {
+                isHoldingShoot = false;
+            };
+            UpdateBulletsPositionDelta((Vector2){ 0.0f, BULLET_STEP });
+            DestroyOffscreenBullets(0);
         }
 
         { // Game Render
             BeginDrawing();
             ClearBackground(BLACK);
-            // DrawText("move the ball with arrow keys", 10, 10, 20, DARKGRAY);
+            if (IsKeyDown(KEY_SPACE)) DrawText("Shoot!", 10, 10, 20, RAYWHITE);
             DrawPlayer();
-            DrawBullet(&bullet);
+            DrawBullets();
             EndDrawing();
         }
     }
