@@ -53,6 +53,15 @@ void EnemiesPositionTick(Vector2 playerPosition) {
     }
 }
 
+void DestroyEnemy(Enemy *enemy) {
+    if (enemy->previous) enemy->previous->next = enemy->next;
+    if (enemy->next) enemy->next->previous = enemy->previous;
+    
+    if (EnemyList == enemy) EnemyList = enemy->next;
+
+    MemFree(enemy);
+}
+
 void DestroyAllEnemies() {
     Enemy *current = EnemyList;
 

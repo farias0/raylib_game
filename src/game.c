@@ -86,7 +86,12 @@ int main(int argc, char **argv)
 
             EnemiesPositionTick(playerPosition);
 
+            Enemy *dummyEnemy = 0; // Allows deleting while looping
             for (Enemy *enemy = EnemyList; enemy; enemy = enemy->next) {
+                if (dummyEnemy) {
+                    MemFree(dummyEnemy);
+                    dummyEnemy = 0;
+                } 
                 if (CheckCollisionRecs(playerHitbox, enemy->hitbox)) {
                     isPlayerDead = true;
                     isPaused = true;
@@ -95,7 +100,16 @@ int main(int argc, char **argv)
                     DestroyAllEnemies();
                     break;
                 }
-            }    
+                for (Bullet *bullet = BulletList; bullet; bullet = bullet->next) {
+                    if (CheckCollisionRecs(enemy->hitbox, bullet->hitbox)) {
+                        dummyEnemy = MemAlloc(sizeof(Enemy));
+                        dummyEnemy->next = enemy->next;
+                        DestroyBullet(bullet);
+                        DestroyEnemy(enemy);
+                        enemy = dummyEnemy;
+                    }
+                }
+            }
         }
 
 render:

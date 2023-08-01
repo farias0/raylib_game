@@ -47,18 +47,22 @@ void BulletsPositionTick() {
     }
 }
 
+void DestroyBullet(Bullet *bullet) {
+    if (bullet->previous) bullet->previous->next = bullet->next;
+    if (bullet->next) bullet->next->previous = bullet->previous;
+    
+    if (BulletList == bullet) BulletList = bullet->next;
+
+    MemFree(bullet);
+}
+
 void DestroyOffscreenBullets(int minY) {
     Bullet *current = BulletList;
 
     while (current) {
         if (current->hitbox.y < minY) {
-            if (current->previous) current->previous->next = current->next;
-            if (current->next) current->next->previous = current->previous;
-            
-            if (BulletList == current) BulletList = current->next;
-
             Bullet *next = current->next;
-            MemFree(current);
+            DestroyBullet(current);
             current = next;
         } else {
             current = current->next;

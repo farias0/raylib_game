@@ -20,6 +20,7 @@ extern Bullet *BulletList;
 void InitializeBulletSystem();
 Bullet *CreateBullet(Vector2 pos);
 void BulletsPositionTick();
+void DestroyBullet(Bullet *bullet);
 void DestroyOffscreenBullets(int minY);
 void DestroyAllBullets();
 void DrawBullets();
