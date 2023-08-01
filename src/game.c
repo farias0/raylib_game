@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <stdio.h>
 
 #include "global.h"
 #include "player.h"
@@ -16,6 +17,9 @@ int main(int argc, char **argv)
 {
     bool isPaused = false;
     bool isPlayerDead = false;
+
+    unsigned long score = 0;
+    char scoreText[30];
 
     float playerMovementStep = DEFAULT_PLAYER_STEP;
     
@@ -103,6 +107,7 @@ int main(int argc, char **argv)
                 if (CheckCollisionRecs(playerHitbox, enemy->hitbox)) {
                     isPlayerDead = true;
                     isPaused = true;
+                    score = 0;
                     SetPlayerStartingPosition(playerStartingPosition);
                     DestroyAllBullets();
                     DestroyAllEnemies();
@@ -116,6 +121,7 @@ int main(int argc, char **argv)
                         DestroyBullet(bullet);
                         DestroyEnemy(enemy);
                         enemy = dummyEnemy;
+                        score += 10;
                     }
                 }
             }
@@ -130,7 +136,8 @@ render:
             DrawEnemies();
             if (isPaused && !isPlayerDead) DrawText("PAUSE", screenWidth/2, screenHeight/2, 30, RAYWHITE);
             if (isPlayerDead) DrawText("YOU DIED", screenWidth/2, screenHeight/2, 60, RAYWHITE);
-            if (IsKeyDown(KEY_SPACE)) DrawText("Shoot!", 10, 10, 20, RAYWHITE);
+            sprintf(scoreText, "Score: %lu", score);
+            DrawText(scoreText, 10, 10, 20, RAYWHITE);
             EndDrawing();
         }
     }

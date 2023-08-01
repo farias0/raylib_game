@@ -6,7 +6,7 @@
 #include "global.h"
 
 #define ENEMY_SPEED 2.0f
-#define ENEMY_SPAWN_RADIUS_FROM_PLAYER 20.0f
+#define ENEMY_SPAWN_RADIUS_FROM_PLAYER 40.0f
 
 static Texture2D sprite;
 
