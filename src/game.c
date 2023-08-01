@@ -43,6 +43,8 @@ int main(int argc, char **argv)
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         { // Game Update
+
+            // Game State
             if (isPaused) {
                 if (IsKeyPressed(KEY_ENTER)) {
                     isPaused = false;
@@ -54,6 +56,7 @@ int main(int argc, char **argv)
                 isPaused = true;
             }
 
+            // Player
             Vector2 playerDelta = { 0.0f, 0.0f };
 
             if (IsKeyDown(KEY_LEFT_SHIFT)) playerMovementStep = RUNNING_PLAYER_STEP;
@@ -70,6 +73,7 @@ int main(int argc, char **argv)
 
             UpdatePlayerPositionDelta(playerDelta);
 
+            // Bullets
             if (IsKeyDown(KEY_SPACE) && (!isHoldingShoot || GetTime() - lastShotTime > HOLDING_FIRERATE)) {
                 CreateBullet((Vector2){ playerHitbox.x + (playerHitbox.width - BULLET_WIDTH) / 2, playerHitbox.y });
                 lastShotTime = GetTime();
@@ -79,6 +83,7 @@ int main(int argc, char **argv)
             BulletsPositionTick();
             DestroyOffscreenBullets(0);
 
+            // Enemies
             if (GetTime() - lastEnemySpawn > ENEMY_SPAWN_RATE) {
                 SpawnEnemy();
                 lastEnemySpawn = GetTime();
@@ -86,12 +91,15 @@ int main(int argc, char **argv)
 
             EnemiesPositionTick(playerPosition);
 
+            // Collision
             Enemy *dummyEnemy = 0; // Allows deleting while looping
             for (Enemy *enemy = EnemyList; enemy; enemy = enemy->next) {
+
                 if (dummyEnemy) {
                     MemFree(dummyEnemy);
                     dummyEnemy = 0;
                 } 
+
                 if (CheckCollisionRecs(playerHitbox, enemy->hitbox)) {
                     isPlayerDead = true;
                     isPaused = true;
@@ -100,6 +108,7 @@ int main(int argc, char **argv)
                     DestroyAllEnemies();
                     break;
                 }
+
                 for (Bullet *bullet = BulletList; bullet; bullet = bullet->next) {
                     if (CheckCollisionRecs(enemy->hitbox, bullet->hitbox)) {
                         dummyEnemy = MemAlloc(sizeof(Enemy));
