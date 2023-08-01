@@ -18,7 +18,7 @@ typedef struct Enemy {
 extern Enemy *EnemyList;
 
 void InitializeEnemySystem();
-Enemy *SpawnEnemy();
+Enemy *SpawnEnemy(Vector2 playerPosition);
 void EnemiesPositionTick(Vector2 playerPosition);
 void DestroyEnemy(Enemy *enemy);
 void DestroyAllEnemies();

@@ -6,12 +6,14 @@
 #include "bullet.h"
 #include "enemy.h"
 
-#define DEFAULT_PLAYER_STEP 2.0f
-#define RUNNING_PLAYER_STEP 10.0f
+#define DEFAULT_PLAYER_STEP 4.0f
+#define RUNNING_PLAYER_STEP 8.0f
 
 #define HOLDING_FIRERATE 0.25f // How many seconds per shot when holding 'fire'
 
-#define ENEMY_SPAWN_RATE 2.0f // How many seconds per enemy will spawn
+#define DEFAULT_ENEMY_SPAWN_RATE 2.0f // How many seconds for an enemy to spawn
+#define ENEMY_SPAWN_RATE_STEP 0.05f
+#define MAX_ENEMY_SPAWN_RATE 0.3f
 
 int main(int argc, char **argv)
 {
@@ -20,6 +22,9 @@ int main(int argc, char **argv)
 
     unsigned long score = 0;
     char scoreText[30];
+    bool isMaxDifficulty = false;
+
+    float enemySpawnRate = DEFAULT_ENEMY_SPAWN_RATE;
 
     float playerMovementStep = DEFAULT_PLAYER_STEP;
     
@@ -88,8 +93,8 @@ int main(int argc, char **argv)
             DestroyOffscreenBullets(0);
 
             // Enemies
-            if (GetTime() - lastEnemySpawn > ENEMY_SPAWN_RATE) {
-                SpawnEnemy();
+            if (GetTime() - lastEnemySpawn > enemySpawnRate) {
+                SpawnEnemy(playerPosition);
                 lastEnemySpawn = GetTime();
             }
 
@@ -108,6 +113,8 @@ int main(int argc, char **argv)
                     isPlayerDead = true;
                     isPaused = true;
                     score = 0;
+                    isMaxDifficulty = false;
+                    enemySpawnRate = DEFAULT_ENEMY_SPAWN_RATE;
                     SetPlayerStartingPosition(playerStartingPosition);
                     DestroyAllBullets();
                     DestroyAllEnemies();
@@ -122,6 +129,8 @@ int main(int argc, char **argv)
                         DestroyEnemy(enemy);
                         enemy = dummyEnemy;
                         score += 10;
+                        if (enemySpawnRate > MAX_ENEMY_SPAWN_RATE) enemySpawnRate -= ENEMY_SPAWN_RATE_STEP;
+                        else isMaxDifficulty = true;
                     }
                 }
             }
@@ -130,14 +139,21 @@ int main(int argc, char **argv)
 render:
         { // Game Render
             BeginDrawing();
+
             ClearBackground(BLACK);
+
             DrawPlayer();
             DrawBullets();
             DrawEnemies();
+
             if (isPaused && !isPlayerDead) DrawText("PAUSE", screenWidth/2, screenHeight/2, 30, RAYWHITE);
             if (isPlayerDead) DrawText("YOU DIED", screenWidth/2, screenHeight/2, 60, RAYWHITE);
+
             sprintf(scoreText, "Score: %lu", score);
-            DrawText(scoreText, 10, 10, 20, RAYWHITE);
+            Color scoreColor = RAYWHITE;
+            if (isMaxDifficulty) scoreColor = RED;
+            DrawText(scoreText, 10, 10, 20, scoreColor);
+
             EndDrawing();
         }
     }
