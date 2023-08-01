@@ -15,30 +15,48 @@
 #define ENEMY_SPAWN_RATE_STEP 0.05f
 #define MAX_ENEMY_SPAWN_RATE 0.3f
 
+typedef struct GameState {
+    bool isPaused;
+    bool isPlayerDead;
+
+    unsigned long score;
+    bool isMaxDifficulty;
+
+    float enemySpawnRate;
+    float playerMovementStep;
+
+    double lastShotTime;
+    double lastEnemySpawn;
+} GameState;
+
+void resetGameState(GameState *state) {
+    state->isPaused = false;
+    state->isPlayerDead = false;
+
+    state->score = 0;
+    state->isMaxDifficulty = false;
+
+    state->enemySpawnRate = DEFAULT_ENEMY_SPAWN_RATE;
+    state->playerMovementStep = DEFAULT_PLAYER_STEP;
+
+    state->lastShotTime = -1;
+    state->lastEnemySpawn = -1;
+
+    SetPlayerStartingPosition((Vector2){ (float)SCREEN_WIDTH/2, (float)SCREEN_HEIGHT/2 });
+    DestroyAllBullets();
+    DestroyAllEnemies();
+}
+
 int main(int argc, char **argv)
 {
-    bool isPaused = false;
-    bool isPlayerDead = false;
+    GameState state;
 
-    unsigned long score = 0;
+    Color scoreColor;
     char scoreText[30];
-    bool isMaxDifficulty = false;
-
-    float enemySpawnRate = DEFAULT_ENEMY_SPAWN_RATE;
-
-    float playerMovementStep = DEFAULT_PLAYER_STEP;
     
     bool isHoldingShoot = false;
-    double lastShotTime = -1;
 
-    double lastEnemySpawn = 0;
-
-    const int screenWidth = SCREEN_WIDTH;
-    const int screenHeight = SCREEN_HEIGHT;
-
-    const Vector2 playerStartingPosition = (Vector2){ (float)screenWidth/2, (float)screenHeight/2 };
-
-    InitWindow(screenWidth, screenHeight, "Space Invaders!");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders!");
     SetTargetFPS(60);
 
     { // Initialization
@@ -46,7 +64,7 @@ int main(int argc, char **argv)
         InitializeBulletSystem();
         InitializeEnemySystem();
 
-        SetPlayerStartingPosition(playerStartingPosition);
+        resetGameState(&state);
     }
 
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -54,38 +72,41 @@ int main(int argc, char **argv)
         { // Game Update
 
             // Game State
-            if (isPaused) {
+            if (state.isPaused) {
                 if (IsKeyPressed(KEY_ENTER)) {
-                    isPaused = false;
-                    isPlayerDead = false;
+                    if (state.isPlayerDead) {
+                        resetGameState(&state);
+                    } else {
+                        state.isPaused = false;
+                    }
                 }
                 else goto render;
             }
             else if (IsKeyPressed(KEY_ENTER)) {
-                isPaused = true;
+                state.isPaused = true;
             }
 
             // Player
             Vector2 playerDelta = { 0.0f, 0.0f };
 
-            if (IsKeyDown(KEY_LEFT_SHIFT)) playerMovementStep = RUNNING_PLAYER_STEP;
-            else playerMovementStep = DEFAULT_PLAYER_STEP;
+            if (IsKeyDown(KEY_LEFT_SHIFT)) state.playerMovementStep = RUNNING_PLAYER_STEP;
+            else state.playerMovementStep = DEFAULT_PLAYER_STEP;
 
-            if (IsKeyDown(KEY_RIGHT) && (playerHitbox.x + playerHitbox.width) < screenWidth)
-                playerDelta.x += playerMovementStep;
-            if (IsKeyDown(KEY_LEFT) && playerHitbox.x > playerMovementStep)
-                playerDelta.x -= playerMovementStep;
-            if (IsKeyDown(KEY_UP) && playerHitbox.y > playerMovementStep)
-                playerDelta.y -= playerMovementStep;
-            if (IsKeyDown(KEY_DOWN) && (playerHitbox.y + playerHitbox.height) < screenHeight)
-                playerDelta.y += playerMovementStep;
+            if (IsKeyDown(KEY_RIGHT) && (playerHitbox.x + playerHitbox.width) < SCREEN_WIDTH)
+                playerDelta.x += state.playerMovementStep;
+            if (IsKeyDown(KEY_LEFT) && playerHitbox.x > state.playerMovementStep)
+                playerDelta.x -= state.playerMovementStep;
+            if (IsKeyDown(KEY_UP) && playerHitbox.y > state.playerMovementStep)
+                playerDelta.y -= state.playerMovementStep;
+            if (IsKeyDown(KEY_DOWN) && (playerHitbox.y + playerHitbox.height) < SCREEN_HEIGHT)
+                playerDelta.y += state.playerMovementStep;
 
             UpdatePlayerPositionDelta(playerDelta);
 
             // Bullets
-            if (IsKeyDown(KEY_SPACE) && (!isHoldingShoot || GetTime() - lastShotTime > HOLDING_FIRERATE)) {
+            if (IsKeyDown(KEY_SPACE) && (!isHoldingShoot || GetTime() - state.lastShotTime > HOLDING_FIRERATE)) {
                 CreateBullet((Vector2){ playerHitbox.x + (playerHitbox.width - BULLET_WIDTH) / 2, playerHitbox.y });
-                lastShotTime = GetTime();
+                state.lastShotTime = GetTime();
                 isHoldingShoot = true;
             } else if (IsKeyUp(KEY_SPACE)) isHoldingShoot = false;
 
@@ -93,9 +114,9 @@ int main(int argc, char **argv)
             DestroyOffscreenBullets(0);
 
             // Enemies
-            if (GetTime() - lastEnemySpawn > enemySpawnRate) {
+            if (GetTime() - state.lastEnemySpawn > state.enemySpawnRate) {
                 SpawnEnemy(playerPosition);
-                lastEnemySpawn = GetTime();
+                state.lastEnemySpawn = GetTime();
             }
 
             EnemiesPositionTick(playerPosition);
@@ -110,14 +131,8 @@ int main(int argc, char **argv)
                 } 
 
                 if (CheckCollisionRecs(playerHitbox, enemy->hitbox)) {
-                    isPlayerDead = true;
-                    isPaused = true;
-                    score = 0;
-                    isMaxDifficulty = false;
-                    enemySpawnRate = DEFAULT_ENEMY_SPAWN_RATE;
-                    SetPlayerStartingPosition(playerStartingPosition);
-                    DestroyAllBullets();
-                    DestroyAllEnemies();
+                    state.isPlayerDead = true;
+                    state.isPaused = true;
                     break;
                 }
 
@@ -128,9 +143,9 @@ int main(int argc, char **argv)
                         DestroyBullet(bullet);
                         DestroyEnemy(enemy);
                         enemy = dummyEnemy;
-                        score += 10;
-                        if (enemySpawnRate > MAX_ENEMY_SPAWN_RATE) enemySpawnRate -= ENEMY_SPAWN_RATE_STEP;
-                        else isMaxDifficulty = true;
+                        state.score += 10;
+                        if (state.enemySpawnRate > MAX_ENEMY_SPAWN_RATE) state.enemySpawnRate -= ENEMY_SPAWN_RATE_STEP;
+                        else state.isMaxDifficulty = true;
                     }
                 }
             }
@@ -146,12 +161,12 @@ render:
             DrawBullets();
             DrawEnemies();
 
-            if (isPaused && !isPlayerDead) DrawText("PAUSE", screenWidth/2, screenHeight/2, 30, RAYWHITE);
-            if (isPlayerDead) DrawText("YOU DIED", screenWidth/2, screenHeight/2, 60, RAYWHITE);
+            if (state.isPaused && !state.isPlayerDead) DrawText("PAUSE", SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 30, RAYWHITE);
+            if (state.isPlayerDead) DrawText("YOU DIED", SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 60, RAYWHITE);
 
-            sprintf(scoreText, "Score: %lu", score);
-            Color scoreColor = RAYWHITE;
-            if (isMaxDifficulty) scoreColor = RED;
+            sprintf(scoreText, "Score: %lu", state.score);
+            if (state.isMaxDifficulty) scoreColor = RED;
+            else scoreColor = RAYWHITE;
             DrawText(scoreText, 10, 10, 20, scoreColor);
 
             EndDrawing();
