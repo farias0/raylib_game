@@ -6,6 +6,7 @@
 #include "global.h"
 
 #define ENEMY_SPEED 2.0f
+#define ENEMY_SPAWN_RADIUS_FROM_PLAYER 20.0f
 
 static Texture2D sprite;
 
@@ -20,10 +21,13 @@ void InitializeEnemySystem() {
     sprite = LoadTexture("../assets/alien_small_green_1_a.png");
 }
 
-Enemy *SpawnEnemy() {
+Enemy *SpawnEnemy(Vector2 playerPosition) {
     Enemy *enemy = MemAlloc(sizeof(Enemy));
     
-    enemy->position = (Vector2){ GetRandomValue(0, SCREEN_WIDTH - ENEMY_WIDTH), GetRandomValue(0, SCREEN_HEIGHT - ENEMY_WIDTH) };
+    do {
+        enemy->position =
+            (Vector2){ GetRandomValue(0, SCREEN_WIDTH - ENEMY_WIDTH), GetRandomValue(0, SCREEN_HEIGHT - ENEMY_WIDTH) };
+    } while (Vector2Distance(enemy->position, playerPosition) < ENEMY_SPAWN_RADIUS_FROM_PLAYER);
     enemy->hitbox.width = ENEMY_WIDTH;
     enemy->hitbox.height = ENEMY_WIDTH;
     syncHitboxWithPosition(enemy);
