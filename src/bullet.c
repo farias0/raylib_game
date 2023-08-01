@@ -1,7 +1,7 @@
 #include <raylib.h>
 #include "bullet.h"
 
-#define BULLET_STEP -6.0f
+#define BULLET_SPEED -6.0f
 
 static Texture2D sprite;
 
@@ -40,7 +40,7 @@ void BulletsPositionTick() {
     Bullet* current = BulletList;
     
     while (current) {
-        current->position.y += BULLET_STEP;
+        current->position.y += BULLET_SPEED;
         syncHitboxWithPosition(current);
 
         current = current->next;

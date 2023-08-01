@@ -6,9 +6,6 @@
 #include "bullet.h"
 #include "enemy.h"
 
-#define DEFAULT_PLAYER_STEP 4.0f
-#define RUNNING_PLAYER_STEP 8.0f
-
 #define HOLDING_FIRERATE 0.25f // How many seconds per shot when holding 'fire'
 
 #define DEFAULT_ENEMY_SPAWN_RATE 2.0f // How many seconds for an enemy to spawn
@@ -23,7 +20,8 @@ typedef struct GameState {
     bool isMaxDifficulty;
 
     float enemySpawnRate;
-    float playerMovementStep;
+
+    PlayerMovementType playerMovementType;
 
     double lastShotTime;
     double lastEnemySpawn;
@@ -37,7 +35,7 @@ void resetGameState(GameState *state) {
     state->isMaxDifficulty = false;
 
     state->enemySpawnRate = DEFAULT_ENEMY_SPAWN_RATE;
-    state->playerMovementStep = DEFAULT_PLAYER_STEP;
+    state->playerMovementType = PLAYER_MOVEMENT_DEFAULT;
 
     state->lastShotTime = -1;
     state->lastEnemySpawn = -1;
@@ -89,19 +87,17 @@ int main(int argc, char **argv)
             // Player
             Vector2 playerDelta = { 0.0f, 0.0f };
 
-            if (IsKeyDown(KEY_LEFT_SHIFT)) state.playerMovementStep = RUNNING_PLAYER_STEP;
-            else state.playerMovementStep = DEFAULT_PLAYER_STEP;
+            if (IsKeyDown(KEY_LEFT_SHIFT)) state.playerMovementType = PLAYER_MOVEMENT_FAST;
+            else state.playerMovementType = PLAYER_MOVEMENT_DEFAULT;
 
             if (IsKeyDown(KEY_RIGHT) && (playerHitbox.x + playerHitbox.width) < SCREEN_WIDTH)
-                playerDelta.x += state.playerMovementStep;
-            if (IsKeyDown(KEY_LEFT) && playerHitbox.x > state.playerMovementStep)
-                playerDelta.x -= state.playerMovementStep;
-            if (IsKeyDown(KEY_UP) && playerHitbox.y > state.playerMovementStep)
-                playerDelta.y -= state.playerMovementStep;
+                MovePlayer(state.playerMovementType, PLAYER_MOVEMENT_RIGHT);
+            if (IsKeyDown(KEY_LEFT) && playerHitbox.x > 0)
+                MovePlayer(state.playerMovementType, PLAYER_MOVEMENT_LEFT);
+            if (IsKeyDown(KEY_UP) && playerHitbox.y > 0)
+                MovePlayer(state.playerMovementType, PLAYER_MOVEMENT_UP);
             if (IsKeyDown(KEY_DOWN) && (playerHitbox.y + playerHitbox.height) < SCREEN_HEIGHT)
-                playerDelta.y += state.playerMovementStep;
-
-            UpdatePlayerPositionDelta(playerDelta);
+                MovePlayer(state.playerMovementType, PLAYER_MOVEMENT_DOWN);
 
             // Bullets
             if (IsKeyDown(KEY_SPACE) && (!isHoldingShoot || GetTime() - state.lastShotTime > HOLDING_FIRERATE)) {
