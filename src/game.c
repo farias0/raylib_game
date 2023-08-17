@@ -113,11 +113,11 @@ int main(int argc, char **argv)
 
             // Enemies
             if (GetTime() - state.lastEnemySpawn > state.enemySpawnRate) {
-                SpawnEnemy(playerPosition);
+                SpawnEnemy((Vector2){playerHitbox.x, playerHitbox.y});
                 state.lastEnemySpawn = GetTime();
             }
 
-            EnemiesPositionTick(playerPosition);
+            EnemiesPositionTick((Vector2){playerHitbox.x, playerHitbox.y});
 
             // Collision
             Enemy *dummyEnemy = 0; // Allows deleting while looping

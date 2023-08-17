@@ -8,7 +8,6 @@
 #define ENEMY_WIDTH (float)(ENEMY_SPRITE_SCALE * 8) // sprite is 8x8 pixels
 
 typedef struct Enemy {
-    Vector2 position;
     Rectangle hitbox;
 
     struct Enemy *next;

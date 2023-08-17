@@ -16,7 +16,6 @@ typedef enum PlayerMovementDirection {
     PLAYER_MOVEMENT_RIGHT
 } PlayerMovementDirection;
 
-extern Vector2 playerPosition;
 extern Rectangle playerHitbox;
 
 void InitializePlayer();

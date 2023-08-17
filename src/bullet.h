@@ -8,7 +8,6 @@
 #define BULLET_WIDTH (float)(BULLET_SPRITE_SCALE * 8) // sprite is 8x8 pixels
 
 typedef struct Bullet {
-    Vector2 position;
     Rectangle hitbox;
 
     struct Bullet *next;

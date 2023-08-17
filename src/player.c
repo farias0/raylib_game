@@ -10,20 +10,14 @@
 static Texture2D sprite;
 
 Rectangle playerHitbox = { 0.0f, 0.0f, PLAYER_WIDTH, PLAYER_WIDTH };
-Vector2 playerPosition = { 0.0f, 0.0f }; // Top left point of the player, from where the sprite will be drawn
-
-static void syncHitboxWithPosition() {
-    playerHitbox.x = playerPosition.x;
-    playerHitbox.y = playerPosition.y;
-}
 
 void InitializePlayer() {
     sprite = LoadTexture("../assets/player_center.png");
 }
 
 void SetPlayerStartingPosition(Vector2 pos) {
-    playerPosition = pos;
-    syncHitboxWithPosition();
+    playerHitbox.x = pos.x;
+    playerHitbox.y = pos.y;
 }
 
 void MovePlayer(PlayerMovementType type, PlayerMovementDirection direction) {
@@ -31,15 +25,13 @@ void MovePlayer(PlayerMovementType type, PlayerMovementDirection direction) {
     if (type == PLAYER_MOVEMENT_FAST) amount = PLAYER_SPEED_FAST;
 
     switch (direction) {
-        case PLAYER_MOVEMENT_UP: playerPosition.y -= amount; break;
-        case PLAYER_MOVEMENT_DOWN: playerPosition.y += amount; break;
-        case PLAYER_MOVEMENT_LEFT: playerPosition.x -= amount; break;
-        case PLAYER_MOVEMENT_RIGHT: playerPosition.x += amount; break;
+        case PLAYER_MOVEMENT_UP: playerHitbox.y -= amount; break;
+        case PLAYER_MOVEMENT_DOWN: playerHitbox.y += amount; break;
+        case PLAYER_MOVEMENT_LEFT: playerHitbox.x -= amount; break;
+        case PLAYER_MOVEMENT_RIGHT: playerHitbox.x += amount; break;
     }
-
-    syncHitboxWithPosition();
 }
 
 void DrawPlayer() {
-    DrawTextureEx(sprite, playerPosition, 0, PLAYER_SPRITE_SCALE, WHITE);
+    DrawTextureEx(sprite, (Vector2){playerHitbox.x, playerHitbox.y}, 0, PLAYER_SPRITE_SCALE, WHITE);
 }

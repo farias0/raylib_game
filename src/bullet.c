@@ -7,11 +7,6 @@ static Texture2D sprite;
 
 Bullet *BulletList;
 
-static void syncHitboxWithPosition(Bullet *bullet) {
-    bullet->hitbox.x = bullet->position.x;
-    bullet->hitbox.y = bullet->position.y;
-}
-
 void InitializeBulletSystem() {
     sprite = LoadTexture("../assets/shoot_a.png");
 }
@@ -19,10 +14,10 @@ void InitializeBulletSystem() {
 Bullet *CreateBullet(Vector2 pos) {
     Bullet *bullet = MemAlloc(sizeof(Bullet));
     
-    bullet->position = pos;
+    bullet->hitbox.x = pos.x;
+    bullet->hitbox.y = pos.y;
     bullet->hitbox.width = BULLET_WIDTH;
     bullet->hitbox.height = BULLET_WIDTH;
-    syncHitboxWithPosition(bullet);
 
     if (!BulletList) {
         BulletList = bullet;
@@ -40,8 +35,7 @@ void BulletsPositionTick() {
     Bullet* current = BulletList;
     
     while (current) {
-        current->position.y += BULLET_SPEED;
-        syncHitboxWithPosition(current);
+        current->hitbox.y += BULLET_SPEED;
 
         current = current->next;
     }
@@ -86,7 +80,7 @@ void DrawBullets() {
     Bullet *current = BulletList;
 
     while (current) {
-        DrawTextureEx(sprite, current->position, 0, BULLET_SPRITE_SCALE, WHITE);
+        DrawTextureEx(sprite, (Vector2){current->hitbox.x, current->hitbox.y}, 0, BULLET_SPRITE_SCALE, WHITE);
         current = current->next; 
     }
 }
