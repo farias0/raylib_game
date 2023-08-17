@@ -54,10 +54,7 @@ int main(int argc, char **argv)
     
     bool isHoldingShoot = false;
 
-    unsigned long gamepad = 0;
-    while (!IsGamepadAvailable(gamepad) && gamepad < 999999999) {
-        gamepad++;
-    }
+    int gamepadIdx = 0;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Space Invaders!");
     SetTargetFPS(60);
@@ -170,10 +167,12 @@ render:
             else scoreColor = RAYWHITE;
             DrawText(scoreText, 10, 10, 20, scoreColor);
 
-            char gpad[8];
-            sprintf(gpad, "%i", gamepad);
-            DrawText(gpad, 10, 30, 20, WHITE);
-            DrawText(GetGamepadName(gamepad), 10, 50, 20, WHITE);
+            if (IsGamepadAvailable(gamepadIdx)) {
+                char gpad[27];
+                sprintf(gpad, "Gamepad index: %i", gamepadIdx);
+                DrawText(gpad, 10, 900, 20, WHITE);
+                DrawText(GetGamepadName(gamepadIdx), 10, 920, 20, WHITE);
+            }
 
             EndDrawing();
         }
